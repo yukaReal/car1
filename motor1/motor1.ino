@@ -5,14 +5,19 @@
 
 #include <AFMotor.h>
 
+#include <Wire.h>
+
+#define MAX_SPEED 190
+
+#define MOTOR_I2C_ID 9
+
 AF_DCMotor motorFR(1);
 AF_DCMotor motorFL(2);
 AF_DCMotor motorRR(3);
 AF_DCMotor motorRL(4);
 
-#define MAX_SPEED 190
-
 uint8_t i;
+int receivedDataFromI2C = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -20,21 +25,24 @@ void setup() {
 
   motor_Stop();
 
+  Wire.begin(MOTOR_I2C_ID);
+  Wire.onReceive(receiveEvent);
+
   delay(10000);
 }
 
 void loop() {
+  //motor_All(FORWARD, MAX_SPEED);
+  //delay(5000);
 
-  motor_All(FORWARD, MAX_SPEED);
-  delay(5000);
-
-  motor_Stop();
-  delay(5000);
+  //motor_Stop();
+  //delay(5000);
 
   //  motorTest(motorFR);
   //  motorTest(motorFL);
   //  motorTest(motorRL);
   //  motorTest(motorRR);
+  delay(500);
 }
 
 void motorTest(AF_DCMotor motor) {
@@ -91,5 +99,15 @@ void motor_Stop() {
   motorRR.run(RELEASE);
 
   Serial.println("motor: full stop");
+}
+
+void receiveEvent(int bytes) {
+  receivedDataFromI2C = Wire.read();
+
+  if (0 == receivedDataFromI2C) {
+    motor_Stop();
+  } else if (1 == receivedDataFromI2C) {
+    motor_All(FORWARD, MAX_SPEED);
+  }
 }
 
