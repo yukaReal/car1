@@ -105,9 +105,25 @@ void receiveEvent(int bytes) {
   receivedDataFromI2C = Wire.read();
 
   if (0 == receivedDataFromI2C) {
+    //stop
     motor_Stop();
   } else if (1 == receivedDataFromI2C) {
+    //forward
     motor_All(FORWARD, MAX_SPEED);
+  } else if (2 == receivedDataFromI2C) {
+    //backward
+    motor_All(BACKWARD, MAX_SPEED / 2);
+  } else if (5 == receivedDataFromI2C) {
+    // rotate right
+    motorFR.run(BACKWARD);
+    motorFL.run(FORWARD);
+    motorRL.run(FORWARD);
+    motorRR.run(BACKWARD);
+
+    motorFR.setSpeed(MAX_SPEED);
+    motorFL.setSpeed(MAX_SPEED);
+    motorRL.setSpeed(MAX_SPEED);
+    motorRR.setSpeed(MAX_SPEED);
   }
 }
 

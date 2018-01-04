@@ -16,7 +16,7 @@
 
 #define MOTION_DETECTOR_PIN  7
 
-#define MAX_DISTANCE 800
+#define MAX_DISTANCE 400
 
 #define MOTOR_I2C_ID 9
 #define DISPLAY_I2C_ID 10
@@ -71,27 +71,35 @@ void loop() {
   Serial.print("Motion detection:");
   Serial.println(isMotionDetected);
 
-
-  if (distanceC > 30) {
+  if (distanceC < 10) {
+    commandForMotor = 0;
+  } else if (distanceC > 70) {
     commandForMotor = 1;
-  }
-
-  if (distanceC <= 30) {
+  } else if (distanceC <= 70 && distanceC > 40 ) {
     commandForMotor = 0;
+  } else if (distanceC <= 40 && distanceC >= 10) {
+    commandForMotor = 2;
+    delay(2000);
+  } else if (distanceL == 0 && distanceR == 0 && distanceC == 0) {
+    commandForMotor = 2;
+    delay(3000);
+    commandForMotor = 5;
+    delay(1000);
   }
+  //  if (distanceL > 10 && distanceL < 20) {
+  //    commandForMotor = 0;
+  //  }
+  //
+  //  if (distanceR > 10 && distanceR < 20) {
+  //    commandForMotor = 0;
+  //  }
 
-  if (distanceL > 0 && distanceL < 10) {
-    commandForMotor = 0;
-  }
-
-  if (distanceR > 0 && distanceR < 10) {
-    commandForMotor = 0;
-  }
 
   sendToMotor();
   sendToDisplay();
 
-  delay(100);
+  delay(300);
+
 }
 
 void sendToDisplay() {
